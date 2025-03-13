@@ -1,8 +1,7 @@
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
-from typing import Dict, Optional, Any
+from typing import Dict, Optional, Any, List
 from fastapi.middleware.cors import CORSMiddleware
-
 
 app = FastAPI()
 app.add_middleware(
@@ -13,42 +12,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Example response structure
+class FamilyData(BaseModel):
+    parent: Optional[Dict[str, Any]] = None
+    children: Optional[List[Dict[str, Any]]] = []
 
-user_infos: Dict[str, dict] = {}
+@app.post("/first_time/")
+async def receive_first_time(data: FamilyData):
+    # Here, 'data' contains the parent and children data
+    data_info = data.dict()  # Converting Pydantic model to a dictionary
 
+    # You can apply any logic to process the received data here
+    print("Received data:", data_info)
 
-class UserInfo(BaseModel):
-    userId: str 
-    age: Optional[str] = None
-    gender: Optional[str] = None
-    height: Optional[str] = None
-
-
-class AnalysisReport(BaseModel):
-    userId:  str
-    report: str
-
-
-
-
-@app.get("/")
-def read_root():
-    return {"message": "Hello, World!"}
-
-
-
-@app.post("/checkIn_optimization_entire/")
-async def receive_check_in(data: UserInfo):
-    data_info = data.dict()
-
+    # Respond back with a success message and the received data
     return {
-        "message": "Check-in and plan adjustment completed successfully!",
+        "message": "First time check-in and plan adjustment completed successfully!",
         "data_info": data_info,
-    
     }
-
-
-
-
-
-
